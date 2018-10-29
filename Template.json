@@ -1,0 +1,58 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "A simple AWS Lambda implementation with AWS CloudFormation. More informations contact Helio Nogueira <helio.nogueira@gmail.com>.",
+    "Parameters": {
+        "LambdaFunctionRoleArn": {
+            "Description": "Select Role (IAM) for Lambda Function",
+            "Type": "String"
+        },
+        "LambdaFunctionVpcSubnetIds": {
+            "Description": "Select Subnets (VPC) for Lambda Function",
+            "Type": "List<AWS::EC2::Subnet::Id>"
+        },
+        "LambdaFunctionVpcSGIds": {
+            "Description": "Select Security Groups (VPC) for Lambda Function",
+            "Type": "List<AWS::EC2::SecurityGroup::Id>"
+        }
+    },
+    "Resources": {
+        "LambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": "helionogueir-simple-aws-cloudformation-lambda",
+                "VpcConfig": {
+                    "SecurityGroupIds": {
+                        "Ref": "LambdaFunctionVpcSGIds"
+                    },
+                    "SubnetIds": {
+                        "Ref": "LambdaFunctionVpcSubnetIds"
+                    }
+                },
+                "Code": {
+                    "ZipFile": "exports.handler = (event, context, callback) => { callback(null, \"Hello World!\"); };"
+                },
+                "Role": {
+                    "Ref": "LambdaFunctionRoleArn"
+                },
+                "Handler": "index.handler",
+                "MemorySize": "128",
+                "Runtime": "nodejs8.10",
+                "Timeout": 10
+            }
+        }
+    },
+    "Outputs": {
+        "LambdaFunctionName": {
+            "Description": "Lambda Function Name",
+            "Value": {
+                "Ref": "LambdaFunction"
+            }
+        },
+        "LambdaFunctionARN": {
+            "Description": "Lambda Function ARN",
+            "Value": {
+                "Fn::GetAtt": ["LambdaFunction", "Arn"]
+            }
+        }
+    }
+}
